@@ -1,0 +1,8 @@
+.vscode/
+.ionide/
+
+# DevTools
+node_modules/**
+
+# wordpress
+php/.env
