@@ -4,5 +4,7 @@
 # DevTools
 node_modules/**
 
+src/backend/*
+
 # wordpress
 php/.env
