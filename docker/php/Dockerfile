@@ -23,4 +23,5 @@ ARG UID=1000
 ARG GID=1000
 RUN groupadd -g $GID dev-user \
     && useradd -m -u $UID -g $GID dev-user
+
 USER dev-user
