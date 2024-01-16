@@ -106,36 +106,6 @@ Zaczero.bootstrap-v4-snippets
 ```
 </div></details>  
 
-## 
-
-### npmでインストール
-
-ワードプレス向けのESlintの設定ファイルを適用させる。
-
-```
-npm install -D eslint @wordpress/eslint-plugin
-```
-
-設定ファイルの作成
-
-.prettierrc.js
-
-```.prettierrc.js
-module.exports = {
-  // 基本的にwordpress用のモジュールが設定されているの記載する必要はない
-}
-
-```
-
-.eslintrc.js
-
-```.eslintrc.js
-module.exports = {
-	extends: [ 'plugin:@wordpress/eslint-plugin/recommended' ],
-};
-
-```
-
 ## ローカル環境のセットアップ
 
 ```
@@ -144,30 +114,7 @@ module.exports = {
 docker-compsoe up -d --build
 ```
 
-以上で[localhost:8080/](localhost:8080)にサイトが立ち上がる
-
-### Scssのコンパイルディレクトリの設定
-
-.vscode/settings.jsonを編集する.
-
-```settings.json
-{
-  "liveSassCompile.settings.formats": [
-    {
-      "format": "expanded",
-      "extensionName": ".css",
-      // プロジェクトのcssディレクトリのパスを指定する
-      "savePath": "/wordpress/wp-content/themes/ssp-saga/assets/css/"
-      // 現在のプロジェクトのテーマファイル内を指定する。
-    }
-  ],
-}
-```
-
-## 基本的なSCSSのフォルダ構成
-
-./Documents/scss.drawioを参照
-![参考画像](./Documents/images/scss.png)
+以上で[localhost:80/](localhost:80)にサイトが立ち上がる
 
 ## Tips
 
@@ -226,5 +173,7 @@ docker-compose.ymlファイルに記載されているポート番号
 
 権限の問題です。
 windowsならwslの実行ユーザー(Ubuntuに登録したユーザー) , MacならTerminalのログインユーザーを「www-data」グループに追加して、新規作成したファイルの権限を775に設定する必要があります。
+
+dev-userという名前とグループでlinuxユーザーを作成しているので、srcの権限にユーザーとグループを追加する必要があります。
 
 

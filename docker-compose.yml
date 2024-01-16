@@ -61,7 +61,7 @@ services:
     container_name: ${PREFIX}_web
     env_file:
       - .env
-      - ./docker/php/${WORDPRESS_DEVELOP_MODE}.env
+      - ./docker/php/wordpress.${WORDPRESS_DEVELOP_MODE}.env
     depends_on:
       - mysql
     volumes:

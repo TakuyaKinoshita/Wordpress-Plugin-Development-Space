@@ -2,12 +2,15 @@
 .ionide/
 
 # DevTools
-node_modules/**
-
 src/backend/*
+!src/backend/.gitkeep
+src/frontend/*
+!src/frontend/.gitkeep
 
 # wordpress
 .env
+docker/php/wordpress.plugin.env
+docker/php/wordpress.theme.env
 
 docker/nginx/logs/*
 docker/nginx/logs/access.log
