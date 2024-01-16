@@ -26,13 +26,14 @@ services:
       args:
         - APP_ENV=${APP_ENV}
     ports:
-      - 80:80
+      - ${NGINX_PORT}:${NGINX_PORT}
+    env_file: .env
     volumes:
-      - ./src/backend:${WORDPRESS_ROOT_DIR}
-      - ./src/frontend:/app
+      - ./src/backend:${NGINX_ROOT_DIR}/${WORDPRESS_INSTALL_DIR}
+      - ./src/frontend:${NGINX_ROOT_DIR}/${VUE_ROOT_DIR}
       - type: bind
         source: ./docker/nginx/logs
-        target: /var/log/nginx
+        target: ${NGINX_LOG_DIR}
     depends_on:
       - wordpress
       - node
@@ -48,7 +49,7 @@ services:
     env_file: .env
     tty: true
     volumes:
-      - ./src/frontend:/app
+      - ./src/frontend:${NGINX_ROOT_DIR}/${VUE_ROOT_DIR}
     networks:
       - app-network
   wordpress:
@@ -63,7 +64,7 @@ services:
     depends_on:
       - mysql
     volumes:
-      - ./src/backend/:${WORDPRESS_ROOT_DIR}
+      - ./src/backend/:${NGINX_ROOT_DIR}/${WORDPRESS_INSTALL_DIR}
     environment:
       WORDPRESS_DB_HOST: ${MYSQL_HOST_NAME}:${MYSQL_PORT} # DBのポートとイメージを指定する
       WORDPRESS_DB_USER: ${MYSQL_DATABASE_USER} # MYSQL_USER

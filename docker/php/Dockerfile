@@ -24,7 +24,7 @@ RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli
 RUN chmod +x wp-cli.phar
 RUN mv wp-cli.phar /usr/local/bin/wp
 
-WORKDIR ${WORDPRESS_ROOT_DIR}
+WORKDIR ${NGINX_ROOT_DIR}/${WORDPRESS_INSTALL_DIR}
 ARG UID=1000
 ARG GID=1000
 RUN groupadd -g $GID dev-user \
