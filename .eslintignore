@@ -1,8 +1,0 @@
-/Tools/**
-/wordpress/wp-content/themes/tobira/js/dist/**
-/wordpress/wp-admin/**
-/wordpress/wp-includes/**
-/wordpress/wp-content/themes/tobira/js/theme.min.js
-/wordpress/wp-content/themes/tobira/js/themes.js
-.eslintrc.js
-.prettierrc.js
