@@ -11,6 +11,7 @@ src/frontend/*
 .env
 docker/php/wordpress.plugin.env
 docker/php/wordpress.theme.env
+docker/php/wordpress.core.env
 
 docker/nginx/logs/*
 docker/nginx/logs/access.log

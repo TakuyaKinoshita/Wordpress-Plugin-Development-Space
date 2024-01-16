@@ -8,9 +8,15 @@ RUN echo "xdebug.remote_enable=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xd
 
 COPY ./docker/php/php.ini /usr/local/etc/php
 COPY ./docker/php/wp-install.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/wp-install.sh
+
+ENV DOCKERIZE_VERSION v0.7.0
+RUN apt-get update \
+    && apt-get install -y wget \
+    && wget -O - https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz | tar xzf - -C /usr/local/bin \
+    && apt-get autoremove -yqq --purge wget && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update && \
-    apt-get upgrade -y && \
     apt-get install -y autoconf
 RUN apt update; apt install -y curl jq
 

@@ -1,5 +1,23 @@
 version: '3.9'
 services:
+  mysql:
+    container_name: ${PREFIX}_db
+    image: mysql:${MYSQL_VERSION}
+    volumes:
+      - type: volume
+        source: db-data
+        target: /var/lib/mysql
+    env_file: .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE_NAME}
+      MYSQL_USER: ${MYSQL_DATABASE_USER}
+      MYSQL_PASSWORD: ${MYSQL_DATABESE_PASSWORD}
+    restart: unless-stopped
+    ports:
+      - ${MYSQL_PORT}:${MYSQL_PORT}
+    networks:
+      - app-network
   nginx:
     container_name: ${PREFIX}_nginx
     build:
@@ -20,26 +38,6 @@ services:
       - node
     networks:
       - app-network
-
-  mysql:
-    container_name: ${PREFIX}_db
-    image: mysql:${MYSQL_VERSION}
-    volumes:
-      - type: volume
-        source: db-data
-        target: /var/lib/mysql
-    env_file: .env
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE_NAME}
-      MYSQL_USER: ${MYSQL_DATABASE_USER}
-      MYSQL_PASSWORD: ${MYSQL_DATABESE_PASSWORD}
-    restart: unless-stopped
-    ports:
-      - ${MYSQL_PORT}:${MYSQL_PORT}
-    networks:
-      - app-network
-  
   node:
     container_name: ${PREFIX}_node
     build:
@@ -53,7 +51,6 @@ services:
       - ./src/frontend:/app
     networks:
       - app-network
-
   wordpress:
     build: 
       context: .
@@ -61,6 +58,7 @@ services:
     container_name: ${PREFIX}_web
     env_file:
       - .env
+      - ./docker/php/wordpress.core.env
       - ./docker/php/wordpress.${WORDPRESS_DEVELOP_MODE}.env
     depends_on:
       - mysql
@@ -75,7 +73,7 @@ services:
       - app-network
     expose:
       - ${WORDPRESS_PORT}
-    command: ["/bin/bash", "/usr/local/bin/wp-install.sh"]
+    command: ["dockerize", "-wait", "tcp://${MYSQL_HOST_NAME}:${MYSQL_PORT}", "-timeout", "60s", "/usr/local/bin/wp-install.sh"]
 
 networks:
   app-network:
