@@ -12,7 +12,7 @@ if [ ! "$(wp core is-installed 2> /dev/null)" ]; then
 
     # wp core download
     CORE_DOWNLOAD="wp core download"
-    [ -n "$WORDPRESS_INSTALL_DIR"  ] && CORE_DOWNLOAD+=" --path=\"$NGINX_ROOT_DIR/$WORDPRESS_INSTALL_DIR\""
+    [ -n "$WORDPRESS_INSTALL_DIR"  ] && CORE_DOWNLOAD+=" --path=\"$NGINX_ROOT_DIR\"/\"$WORDPRESS_INSTALL_DIR\""
     [ -n "$WORDPRESS_CORE_DOWNLOAD_LOCALE" ] && CORE_DOWNLOAD+=" --locale=\"$WORDPRESS_CORE_DOWNLOAD_LOCALE\""
     [ -n "$WORDPRESS_CORE_DOWNLOAD_VERSION" ] && CORE_DOWNLOAD+=" --version=\"$WORDPRESS_CORE_DOWNLOAD_VERSION\""
     [ "$WORDPRESS_CORE_DOWNLOAD_SKIP_CONTENT" = "true" ] && CORE_DOWNLOAD+=" --skip-content"
@@ -41,7 +41,7 @@ if [ ! "$(wp core is-installed 2> /dev/null)" ]; then
     fi
 
     wp core install \
-        --url="http://${NGINX_SERVER_NAME}" \
+        --url="http://${NGINX_SERVER_NAME}/${WORDPRESS_INSTALL_DIR}" \
         --title="${WORDPRESS_SITE_TITLE}" \
         --admin_user="${WORDPRESS_USER}" \
         --admin_password="${WORDPRESS_USER_PASSWORD}" \
