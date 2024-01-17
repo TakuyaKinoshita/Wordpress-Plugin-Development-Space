@@ -1,6 +1,6 @@
 # README
 
-## 開発環境
+## development environment
 
 ```
 # Windows
@@ -17,163 +17,61 @@ Terminal
 VScode
 ```
 
-## 構成図
+## Setup
+
+1.  Copy the sample.env file and save it as a .env file
 
 ```
-.
-├── Tools
-│   └── php7.4
-│       └── php.exe
-├── bootstrap
-├── Dockerfile
-├── docker-compose.yml
-├── mysql
-├── package-lock.json
-├── wordpress
-├── Documents
-└── README.md
-
-```
-## Dockerのインストール
-
-下記サイトからインストール  
-[Docker-Desctop](https://www.docker.com/products/docker-desktop)
-
-<details><summary>Windows向けの設定方法</summary><div>
-
-
-</div></details>
-
-<details><summary>Mac向けの設定方法</summary><div>
-
-
-</div></details>
-
-## VSCodeのインストール
-
-extnsionをインストールする。
-
-<details><summary>木下VSCodeインストールExtension例</summary><div>
-
-```bash
-anseki.vscode-color
-azemoh.one-monokai
-christian-kohler.npm-intellisense
-codezombiech.gitignore
-eg2.vscode-npm-script
-felixfbecker.php-intellisense
-felixfbecker.php-pack
-imperez.smarty
-PKief.material-icon-theme
-syler.sass-indented
-Wscats.eno
-
-eamodio.gitlens
-KnisterPeter.vscode-github
-GitHub.vscode-pull-request-github
-cschleiden.vscode-github-actions
-donjayamanne.githistory
-mhutchie.git-graph
-
-ms-azuretools.vscode-docker
-p1c2u.docker-compose
-ms-vscode-remote.remote-containers
-ms-vscode-remote.remote-wsl
-
-bmewburn.vscode-intelephense-client
-felixfbecker.php-debug
-rifi2k.format-html-in-php
-neilbrayfield.php-docblocker
-
-MS-CEINTL.vscode-language-pack-ja
-alefragnani.project-manager
-hediet.vscode-drawio
-oderwat.indent-rainbow
-Asuka.insertnumbers
-formulahendry.auto-rename-tag
-mosapride.zenkaku
-royaction.color-manager
-purocean.drawio-preview
-
-dbaeumer.vscode-eslint
-esbenp.prettier-vscode
-ritwickdey.live-sass
-ritwickdey.LiveServer
-thekalinga.bootstrap4-vscode
-eventyret.bootstrap-4-cdn-snippet
-Zaczero.bootstrap-v4-snippets
-
-```
-</div></details>  
-
-## ローカル環境のセットアップ
-
-```
-# Docker-compose.ymlと同じディレクトリか、その下位ディレクトリで
-
-docker-compsoe up -d --build
+$ copy sample.env .env
 ```
 
-以上で[localhost:80/](localhost:80)にサイトが立ち上がる
-
-## Tips
-
-### [FireFoxでlocalhostにアクセスできない](https://labor.ewigleere.net/2021/01/29/firefox_restrict_non_well_known_port/)
-
-### [他のPCやスマホ端末でローカル環境を確認したい](https://weback.net/procedure/1752/)
-
-### ローカル環境を社内ネットワークで公開したい時
-
-<details><summary>詳細</summary><div>
-
-#### 事前準備
-
-上記の[他のPCやスマホ端末でローカル環境を確認したい](https://weback.net/procedure/1752/)を行い、ESET等のセキュリティソフトでローカルIPアドレスでのアクセスを許可する設定を行う
-
-#### ルールの作成
-
-![](Documents/images/img10.png)
-
-「追加」を押して新しいルールを作成する
-
--  一般設定
+2.  Set environment variables in the .env file
 
 ```
-# 名前
-何のルールなのかを名づける
-
-# 方向
-# 外向き(ローカル -> リモート)
-# 内向き(リモート -> ローカル)
-# 双方向
-双方向を選択する
-
-# アクション
-許可
-
-# プロトコル
-TCPおよびUDP
+# Items that must be changed or set
+PREFIX=
+WORDPRESS_DEVELOP_MODE
 ```
 
-- ローカル設定
+> [!NOTE]
+> `WORDPRESS_DEVELOP_MODE` can be selected from three modes: `plugin`, `theme`, or `empty`, and currently only `plugin` is supported.
+> 
+> The port number of each application does not conflict with the port of the development PC, so it is recognized as a port number on the Docker Network that can be operated with the same settings as before.
+
+> [!IMPORTANT]
+> If you set `WORDPRESS_DEVELOP_MODE` to `plugin` or `theme`, you need to copy and rename either `docker/php/wordpress.plugin.env.sample` or `docker/php/wordpress.theme.env. sample`, depending on the mode you have chosen.
+>
+> `docker/php/wordpress.plugin.env.sample` rename to `docker/php/wordpress.plugin.env`
+>
+> `docker/php/wordpress.theme.env.sample` rename to `docker/php/wordpress.theme.env`
+
+> [!CAUTION]
+> If you change `WORDPRESS_INSTALL_DIR` and `VUE_ROOT_DIR`, you need to reconfigure `docker/nginx/default.development.conf`.
+> By default, the reverse proxy is set up to link to the wordpress container when access is made to `http://localhost/wp`, and the same goes for the vue container. There are also places in the `Dockerfile` and `docker-compose.yml` files where environment variables are used, and if the path is empty, etc., there will be a lot of slashes and an error may occur.
+> If you want to modify it, you need to check the path settings of the wordpress install directory and volume mount directory settings, path settings in the env file, paths specified in docker-compose.yml, and other paths that affect the paths.
+
+3.  Copy docker/php/wordpress.core.env.sample and rename it to wordpress.core.env
 
 ```
-#　ポート
-docker-compose.ymlファイルに記載されているポート番号
-
-# IP
-192.168.1.0/255.255.255.0
+# Items that must be changed or set
+# You can set the code that can be set in WordPress. Some of the language codes are listed in the .env file.
+# @see [country code](https://www.gnu.org/savannah-checkouts/gnu/gettext/manual/gettext.html#Country-Codes)
+# @see (language code)[https://www.gnu.org/savannah-checkouts/gnu/gettext/manual/gettext.html#Language-Codes]
+WORDPRESS_CORE_DOWNLOAD_LOCALE
+# The version can be specified by a number (8.0.0) or a character such as latest
+WORDPRESS_CORE_DOWNLOAD_VERSION
+Do not let WordPress install themes and plugins initially.
+If true, nothing is installed.
+If false, they will be installed.
+WORDPRESS_CORE_DOWNLOAD_SKIP_CONTENT=true
 ```
 
-#### 参考URL
-[https://help.eset.com/ees/7/ja-JP/idh_config_epfw_ids_exceptions.html](https://help.eset.com/ees/7/ja-JP/idh_config_epfw_ids_exceptions.html)
-</div></details>
+4. run `make init` in terminal
 
-#### ファイルの編集ができない or 保存ができない
+```
+$ make init
+```
 
-権限の問題です。
-windowsならwslの実行ユーザー(Ubuntuに登録したユーザー) , MacならTerminalのログインユーザーを「www-data」グループに追加して、新規作成したファイルの権限を775に設定する必要があります。
+1. Access the server path you set up
 
-dev-userという名前とグループでlinuxユーザーを作成しているので、srcの権限にユーザーとグループを追加する必要があります。
-
-
+[you can jump to the wordpress admin page](http://localhost/wp/wp-admin)
