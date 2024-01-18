@@ -29,8 +29,8 @@ services:
       - ${NGINX_PORT}:${NGINX_PORT}
     env_file: .env
     volumes:
-      - ./src/backend:${NGINX_ROOT_DIR}/${WORDPRESS_INSTALL_DIR}
-      - ./src/frontend:${NGINX_ROOT_DIR}/${VUE_ROOT_DIR}
+      # - ./src/backend:${NGINX_ROOT_DIR}/${WORDPRESS_INSTALL_DIR}
+      # - ./src/frontend:${NGINX_ROOT_DIR}/${VUE_ROOT_DIR}
       - type: bind
         source: ./docker/nginx/logs
         target: ${NGINX_LOG_DIR}
@@ -49,7 +49,7 @@ services:
     env_file: .env
     tty: true
     volumes:
-      - ./src/frontend:${NGINX_ROOT_DIR}/${VUE_ROOT_DIR}
+      - ./src/frontend:/${VUE_ROOT_DIR}
     networks:
       - app-network
   wordpress:
@@ -65,6 +65,7 @@ services:
       - mysql
     volumes:
       - ./src/backend/:${NGINX_ROOT_DIR}/${WORDPRESS_INSTALL_DIR}
+      - ./src/frontend/:/${VUE_ROOT_DIR}
     environment:
       WORDPRESS_DB_HOST: ${MYSQL_HOST_NAME}:${MYSQL_PORT} # DBのポートとイメージを指定する
       WORDPRESS_DB_USER: ${MYSQL_DATABASE_USER} # MYSQL_USER
