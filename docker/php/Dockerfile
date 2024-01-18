@@ -9,6 +9,7 @@ RUN echo "xdebug.remote_enable=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xd
 COPY ./docker/php/php.ini /usr/local/etc/php
 COPY ./docker/php/wp-install.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/wp-install.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 ENV DOCKERIZE_VERSION v0.7.0
 RUN apt-get update \

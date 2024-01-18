@@ -13,7 +13,11 @@ stop:
 log:
 	docker compose logs
 init:
+	rm -rf wordpress/*
 	rm -rf src/backend/*
 	rm -rf docker/nginx/logs/*
 	@make down
 	@make up-build
+createblock-%:
+	set -a && source .env && set +a
+	docker exec -it wordpress npx @wordpress/create-block ${@:createblock-%=%} /$${VUE_ROOT_DIR}

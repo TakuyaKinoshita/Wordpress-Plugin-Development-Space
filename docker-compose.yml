@@ -18,6 +18,11 @@ services:
       - ${MYSQL_PORT}:${MYSQL_PORT}
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u${MYSQL_DATABASE_USER}", "-p${MYSQL_DATABESE_PASSWORD}"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
   nginx:
     container_name: ${PREFIX}_nginx
     build:
@@ -29,21 +34,22 @@ services:
       - ${NGINX_PORT}:${NGINX_PORT}
     env_file: .env
     volumes:
-      # - ./src/backend:${NGINX_ROOT_DIR}/${WORDPRESS_INSTALL_DIR}
-      # - ./src/frontend:${NGINX_ROOT_DIR}/${VUE_ROOT_DIR}
+      - ./wordpress:${NGINX_ROOT_DIR}/${WORDPRESS_INSTALL_DIR}
       - type: bind
         source: ./docker/nginx/logs
         target: ${NGINX_LOG_DIR}
     depends_on:
-      - wordpress
-      - node
+      wordpress:
+        condition: service_healthy
+      node:
+        condition: service_started
     networks:
       - app-network
   node:
     container_name: ${PREFIX}_node
     build:
       context: .
-      dockerfile: docker/node/Dockerfile
+      dockerfile: ./docker/node/Dockerfile
       args:
         - APP_ENV=${APP_ENV}
     env_file: .env
@@ -55,17 +61,19 @@ services:
   wordpress:
     build: 
       context: .
-      dockerfile: docker/php/Dockerfile
+      dockerfile: ./docker/php/Dockerfile
     container_name: ${PREFIX}_web
     env_file:
       - .env
       - ./docker/php/wordpress.core.env
       - ./docker/php/wordpress.${WORDPRESS_DEVELOP_MODE}.env
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     volumes:
-      - ./src/backend/:${NGINX_ROOT_DIR}/${WORDPRESS_INSTALL_DIR}
-      - ./src/frontend/:/${VUE_ROOT_DIR}
+      - ./wordpress:${NGINX_ROOT_DIR}/${WORDPRESS_INSTALL_DIR}
+      - ./src/backend:/tmp/src/backend
+      - ./src/frontend:/tmpsrc/frontend
     environment:
       WORDPRESS_DB_HOST: ${MYSQL_HOST_NAME}:${MYSQL_PORT} # DBのポートとイメージを指定する
       WORDPRESS_DB_USER: ${MYSQL_DATABASE_USER} # MYSQL_USER
@@ -75,9 +83,15 @@ services:
       - app-network
     expose:
       - ${WORDPRESS_PORT}
-    command: ["dockerize", "-wait", "tcp://${MYSQL_HOST_NAME}:${MYSQL_PORT}", "-timeout", "60s", "/usr/local/bin/wp-install.sh"]
-
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://wordpress:${WORDPRESS_PORT} || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 1000 
+    entrypoint: ["/usr/local/bin/wp-install.sh"]
+    # command: ["dockerize", "-wait", "tcp://${MYSQL_HOST_NAME}:${MYSQL_PORT}", "-timeout", "60s", "/usr/local/bin/wp-install.sh"]
 networks:
   app-network:
 volumes:
   db-data:
+  web-data:

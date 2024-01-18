@@ -6,11 +6,13 @@ src/backend/*
 !src/backend/.gitkeep
 src/frontend/*
 !src/frontend/.gitkeep
+wordpress/*
+!wordpress/.gitkeep
 
 # wordpress
 .env
-docker/php/wordpress.plugin.env
-docker/php/wordpress.theme.env
+docker/php/wordpress.plugins.env
+docker/php/wordpress.themes.env
 docker/php/wordpress.core.env
 
 docker/nginx/logs/*

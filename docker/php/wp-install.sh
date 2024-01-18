@@ -57,14 +57,15 @@ if [ ! "$(wp core is-installed 2> /dev/null)" ]; then
     wp option update permalink_structure "/%post_id%/" --allow-root
 fi
 
-if [ "${WORDPRESS_DEVELOP_MODE}" = "plugin" ]; then
-    if wp plugin is-installed "${WORDPRESS_PLUGIN_SLUG}" ; then
-        echo "Plugin${WORDPRESS_PLUGIN_SLUG}は既にインストールされています。"
-        php-fpm
+link_flg=false
+
+if [ "${WORDPRESS_DEVELOP_MODE}" = "plugins" ]; then
+    if wp plugin is-installed "${WORDPRESS_DEVELOPMENT_SLUG}" ; then
+        echo "plugin ${WORDPRESS_DEVELOPMENT_SLUG}は既にインストールされています。"
     else
         # 環境変数の存在チェックと設定
-        if [ -n "$WORDPRESS_PLUGIN_SLUG" ]; then
-            PLUGIN_COMMAND="wp scaffold plugin \"$WORDPRESS_PLUGIN_SLUG\""
+        if [ -n "$WORDPRESS_DEVELOPMENT_SLUG" ]; then
+            PLUGIN_COMMAND="wp scaffold plugin \"$WORDPRESS_DEVELOPMENT_SLUG\""
             # WORDPRESS_PLUGIN_DIRが存在する場合は --dir オプションを追加
             [ -n "$WORDPRESS_PLUGIN_DIR" ] && PLUGIN_COMMAND+=" --dir=\"$WORDPRESS_PLUGIN_DIR\""
             [ -n "$WORDPRESS_PLUGIN_NAME" ] && PLUGIN_COMMAND+=" --plugin_name=\"$WORDPRESS_PLUGIN_NAME\""
@@ -79,11 +80,46 @@ if [ "${WORDPRESS_DEVELOP_MODE}" = "plugin" ]; then
             [ "$WORDPRESS_PLUGIN_FORCE" = "true" ] && PLUGIN_COMMAND+=" --force"
             # 最終的なコマンドを実行
             eval "$PLUGIN_COMMAND"
+            link_flg=true
         else
-            echo "WORDPRESS_PLUGIN_SLUGが設定されていません。処理を中止します。"
+            echo "WORDPRESS_DEVELOPMENT_SLUGが設定されていません。処理を中止します。"
             exit 1
         fi
     fi
 fi
 
-php-fpm
+if [ "${WORDPRESS_DEVELOP_MODE}" = "themes" ]; then
+    if wp plugin is-installed "${WORDPRESS_DEVELOPMENT_SLUG}" ; then
+        echo "theme ${WORDPRESS_DEVELOPMENT_SLUG}は既にインストールされています。"
+    else
+        # 環境変数の存在チェックと設定
+        if [ -n "$WORDPRESS_DEVELOPMENT_SLUG" ]; then
+            THEME_COMMAND="wp scaffold _s \"$WORDPRESS_DEVELOPMENT_SLUG\""
+            # WORDPRESS_PLUGIN_DIRが存在する場合は --dir オプションを追加
+            [ -n "$WORDPRESS_THEME_NAME" ] && THEME_COMMAND+=" --theme_name=\"$WORDPRESS_THEME_NAME\""
+            [ -n "$WORDPRESS_THEME_AUTHOR" ] && THEME_COMMAND+=" --author=\"$WORDPRESS_THEME_AUTHOR\""
+            [ -n "$WORDPRESS_THEME_AUTHOR_URI" ] && THEME_COMMAND+=" --author_uri=\"$WORDPRESS_THEME_AUTHOR_URI\""
+            [ "$WORDPRESS_THEME_ACTIVATE" = "true" ] && THEME_COMMAND+=" --activate"
+            [ "$WORDPRESS_THEME_ENABLE_NETWORK" = "true" ] && THEME_COMMAND+=" --enable-network"
+            [ "$WORDPRESS_THEME_SASSIFY" = "true" ] && THEME_COMMAND+=" --sassify"
+            [ "$WORDPRESS_THEME_WOOCOMMERCE" = "true" ] && THEME_COMMAND+=" --woocommerce"
+            [ "$WORDPRESS_THEME_FORCE" = "true" ] && THEME_COMMAND+=" --force"
+            # 最終的なコマンドを実行
+            eval "$THEME_COMMAND"
+            link_flg=true
+        else
+            echo "WORDPRESS_DEVELOPMENT_SLUGが設定されていません。処理を中止します。"
+            exit 1
+        fi
+    fi
+fi
+
+if [ "${link_flg}" = true ]; then
+    # フォルダの内容をコピー
+    cp -r ${NGINX_ROOT_DIR}/${WORDPRESS_INSTALL_DIR}/wp-content/${WORDPRESS_DEVELOP_MODE}/${WORDPRESS_DEVELOPMENT_SLUG}/* /tmp/src/backend
+    # シンボリックリンクを作成
+    ln -s /tmp/src/backend ${NGINX_ROOT_DIR}/${WORDPRESS_INSTALL_DIR}/wp-content/${WORDPRESS_DEVELOP_MODE}/${WORDPRESS_DEVELOPMENT_SLUG}
+fi
+
+# wp-install.sh の最後に以下を追加
+exec /usr/local/bin/docker-entrypoint "$@"
