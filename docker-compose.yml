@@ -73,7 +73,7 @@ services:
     volumes:
       - ./wordpress:${NGINX_ROOT_DIR}/${WORDPRESS_INSTALL_DIR}
       - ./src/backend:/tmp/src/backend
-      - ./src/frontend:/tmpsrc/frontend
+      - ./src/frontend:/tmp/src/frontend
     environment:
       WORDPRESS_DB_HOST: ${MYSQL_HOST_NAME}:${MYSQL_PORT} # DBのポートとイメージを指定する
       WORDPRESS_DB_USER: ${MYSQL_DATABASE_USER} # MYSQL_USER
@@ -84,7 +84,7 @@ services:
     expose:
       - ${WORDPRESS_PORT}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://wordpress:${WORDPRESS_PORT} || exit 1"]
+      test: ["CMD", "curl", "--fail", "http://localhost:${WORDPRESS_PORT}/ping"]
       interval: 10s
       timeout: 10s
       retries: 1000 

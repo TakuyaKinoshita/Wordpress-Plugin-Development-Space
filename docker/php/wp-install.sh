@@ -121,5 +121,4 @@ if [ "${link_flg}" = true ]; then
     ln -s /tmp/src/backend ${NGINX_ROOT_DIR}/${WORDPRESS_INSTALL_DIR}/wp-content/${WORDPRESS_DEVELOP_MODE}/${WORDPRESS_DEVELOPMENT_SLUG}
 fi
 
-# wp-install.sh の最後に以下を追加
-exec /usr/local/bin/docker-entrypoint "$@"
+php-fpm
